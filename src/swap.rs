@@ -90,7 +90,12 @@ pub trait DevNetFaucet {
         );
 
         let balance = self.blockchain().get_sc_balance(&token_id, 0u64);
-        let amount = BigUint::from(1000u32) * BigUint::from(10u32).pow(18);
+        let amount;
+        if token_id == TokenIdentifier::egld() {
+            amount = BigUint::from(1u32) * BigUint::from(10u32).pow(17);
+        } else {
+            amount = BigUint::from(1000u32) * BigUint::from(10u32).pow(18);
+        }
         require!(amount <= balance, "Not enough tokens in the SC to claim");
 
         self.last_claim(&caller, &token_id).set(current_time);
