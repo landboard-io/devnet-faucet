@@ -19,6 +19,17 @@ pub trait DevNetFaucet {
         token_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
     ) {
+        const props=FungibleTokenProperties {
+            can_burn: true,
+            can_mint: true,
+            num_decimals: 18usize,
+            can_freeze: false,
+            can_wipe: false,
+            can_pause: false,
+            can_change_owner: true,
+            can_upgrade: true,
+            can_add_special_roles: true,
+        }
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
@@ -26,17 +37,7 @@ pub trait DevNetFaucet {
                 &token_name,
                 &token_ticker,
                 &(BigUint::from(100000000u32) * BigUint::from(10u32).pow(18)),
-                FungibleTokenProperties {
-                    can_burn: false,
-                    can_mint: false,
-                    num_decimals: 18usize,
-                    can_freeze: false,
-                    can_wipe: false,
-                    can_pause: false,
-                    can_change_owner: true,
-                    can_upgrade: true,
-                    can_add_special_roles: true,
-                },
+                props,
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
@@ -92,9 +93,9 @@ pub trait DevNetFaucet {
         let balance = self.blockchain().get_sc_balance(&token_id, 0u64);
         let amount;
         if token_id == TokenIdentifier::egld() {
-            amount = BigUint::from(1u32) * BigUint::from(10u32).pow(17);
+            amount = BigUint::from(1u32) * BigUint::from(10u32).pow(18) / BigUint::from(10u32);
         } else {
-            amount = BigUint::from(1000u32) * BigUint::from(10u32).pow(18);
+            amount = BigUint::from(1u32) * BigUint::from(10u32).pow(18u32);
         }
         require!(amount <= balance, "Not enough tokens in the SC to claim");
 
