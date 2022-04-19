@@ -19,7 +19,7 @@ pub trait DevNetFaucet {
         token_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
     ) {
-        const props=FungibleTokenProperties {
+        const PROPS: FungibleTokenProperties = FungibleTokenProperties {
             can_burn: true,
             can_mint: true,
             num_decimals: 18usize,
@@ -29,7 +29,7 @@ pub trait DevNetFaucet {
             can_change_owner: true,
             can_upgrade: true,
             can_add_special_roles: true,
-        }
+        };
         self.send()
             .esdt_system_sc_proxy()
             .issue_fungible(
@@ -37,7 +37,7 @@ pub trait DevNetFaucet {
                 &token_name,
                 &token_ticker,
                 &(BigUint::from(100000000u32) * BigUint::from(10u32).pow(18)),
-                props,
+                PROPS,
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
