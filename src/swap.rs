@@ -47,7 +47,7 @@ pub trait DevNetFaucet {
     #[callback]
     fn issue_callback(&self, #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>) {
         match result {
-            ManagedAsyncCallResult::Ok(_) => {}
+            ManagedAsyncCallResult::Ok(_token_id) => {}
             ManagedAsyncCallResult::Err(_) => {
                 let caller = self.blockchain().get_owner_address();
                 let (returned_tokens, token_id) = self.call_value().payment_token_pair();
@@ -95,13 +95,13 @@ pub trait DevNetFaucet {
         if token_id == TokenIdentifier::egld() {
             amount = BigUint::from(1u32) * BigUint::from(10u32).pow(18) / BigUint::from(10u32);
         } else {
-            amount = BigUint::from(1u32) * BigUint::from(10u32).pow(18u32);
+            amount = BigUint::from(1000u32) * BigUint::from(10u32).pow(18u32);
         }
         require!(amount <= balance, "Not enough tokens in the SC to claim");
 
         self.last_claim(&caller, &token_id).set(current_time);
 
-        self.send().direct(&caller, &token_id, 0, &balance, &[]);
+        self.send().direct(&caller, &token_id, 0, &amount, &[]);
     }
 
     #[view(getLastClaim)]
